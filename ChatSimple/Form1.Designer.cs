@@ -123,6 +123,7 @@
             btnEnviar.TabIndex = 9;
             btnEnviar.Text = "Enviar";
             btnEnviar.UseVisualStyleBackColor = true;
+            btnEnviar.Click += btnEnviar_Click;
             // 
             // Form1
             // 

@@ -23,18 +23,46 @@ namespace ChatSimple
                     int port = int.Parse(txtPuerto.Text);
                     TcpListener server = new TcpListener(IPAddress.Any, port);
                     server.Start();
+                    string ip = getIP();
+                    rtbHistorial.AppendText("Servidor iniciado en la IP y puerto: " + ip + ":" + port + "\n");
                     // Esperar a que un cliente se conecte de manera asincrona
                     cliente = await server.AcceptTcpClientAsync();
                     rtbHistorial.AppendText("Cliente conectado!\n");
                     // funcion que obtenga los datos entrantes 
-
+                    ConfigurarStream();
+                    _ = RecibirMensajes(); //-= se manda aolllmar a si mismo y se guarda
+                }
+                else
+                {
+                    string ip = txtIP.Text;
+                    int port = int.Parse(txtPuerto.Text);
+                    cliente = new TcpClient();
+                    rtbHistorial.AppendText("Conectando al servidor ......\n");
+                    await cliente.ConnectAsync(ip, port);
+                    rtbHistorial.AppendText("Conectado\n");
+                    ConfigurarStream();
+                    _ = RecibirMensajes();
                 }
             }
             catch (Exception ex)
             {
-
-
+                MessageBox.Show("Error: " + ex.ToString());
             }
+        }
+        private string getIP()
+        {
+            string hostName = Dns.GetHostName();
+            string myIP = "";
+            IPHostEntry host = Dns.GetHostEntry(hostName);
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    myIP = ip.ToString();
+                    break;
+                }
+            }
+            return myIP;
         }
 
         private void ConfigurarStream()
@@ -62,11 +90,11 @@ namespace ChatSimple
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 rtbHistorial.Invoke((MethodInvoker)delegate
                 {
-                    rtbHistorial.AppendText("Cliente Desconectado: \n " );
+                    rtbHistorial.AppendText("Cliente Desconectado: \n ");
 
 
                 });
@@ -76,6 +104,28 @@ namespace ChatSimple
 
         }
 
+        private async Task btnEnviar_Click(object sender, EventArgs e)
+        {
+            if (cliente != null && cliente.Connected && !string.IsNullOrWhiteSpace(txtMensaje.Text))
+            {
+                try
+                {
+                    string mensaje = txtMensaje.Text;
+                    await writer.WriteLineAsync(mensaje);
+                    rtbHistorial.AppendText("Yo: " + mensaje + "\n");
+                    txtMensaje.Clear();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error:" + ex.ToString());
+                }
+            }
+            else
+            {
+                MessageBox.Show("No hay clientes conectados", "Sistema", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
     }
-
 }
+
+

@@ -104,26 +104,29 @@ namespace ChatSimple
 
         }
 
-        private async Task btnEnviar_Click(object sender, EventArgs e)
+        private async void btnEnviar_Click(object sender, EventArgs e)
         {
-            if (cliente != null && cliente.Connected && !string.IsNullOrWhiteSpace(txtMensaje.Text))
+            if (cliente !=
+                null && cliente.Connected &&
+                !string.IsNullOrWhiteSpace(txtMensaje.Text))
             {
                 try
                 {
                     string mensaje = txtMensaje.Text;
                     await writer.WriteLineAsync(mensaje);
+
                     rtbHistorial.AppendText("Yo: " + mensaje + "\n");
                     txtMensaje.Clear();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error:" + ex.ToString());
+                    MessageBox.Show("Error:" +
+                    ex.ToString());
                 }
             }
             else
-            {
-                MessageBox.Show("No hay clientes conectados", "Sistema", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+                MessageBox.Show("No hay clientes conectados", "Sistema",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }
